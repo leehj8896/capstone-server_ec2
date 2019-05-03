@@ -1,8 +1,10 @@
 from django.http import HttpResponse
+from .models import Event
+from .models import Place
 import MySQLdb
 
 def index(request):
-    return HttpResponse("/event/ /place/ /event_has_place/");
+    return HttpResponse("/event/ /place/ /imply/");
 
 def event(request):
 
@@ -10,9 +12,9 @@ def event(request):
 
     return HttpResponse(print_dicts(query));
 
-def event_has_place(request):
+def imply(request):
 
-    query = "select * from event_has_place"
+    query = "select * from imply"
 
     return HttpResponse(print_dicts(query))
 
@@ -24,7 +26,7 @@ def place(request):
 
 def print_dicts(query):
 
-    conn = MySQLdb.connect('127.0.0.1', 'root', '', 'mydb', charset='utf8')
+    conn = MySQLdb.connect('127.0.0.1', 'root', '', 'capstone', charset='utf8')
     curs = conn.cursor(MySQLdb.cursors.DictCursor)
     curs.execute(query)
     rows = curs.fetchall()
@@ -35,3 +37,17 @@ def print_dicts(query):
     conn.close()
 
     return result
+
+def insert_event(request):
+    
+    lastId = Event.objects.all().last().event_id
+    event = Event.objects.create(event_id = lastId + 1, event_name = request.POST['event_name'])
+    
+    return HttpResponse()
+
+def insert_place(request):
+
+    lastId = Place.objects.all().last().place_id
+    event = Place.objects.create(place_id = lastId + 1, place_name = 'place name')
+
+    return HttpResponse()
