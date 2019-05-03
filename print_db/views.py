@@ -1,6 +1,5 @@
 from django.http import HttpResponse
-from .models import Event
-from .models import Place
+from .models import *
 import MySQLdb
 
 def index(request):
@@ -41,7 +40,7 @@ def print_dicts(query):
 def insert_event(request):
     
     lastId = Event.objects.all().last().event_id
-    event = Event.objects.create(event_id = lastId + 1, event_name = request.POST['event_name'])
+    event = Event.objects.create(event_id = lastId + 1, event_name = request.POST.get('event_name', '값없음'), reward = request.POST.get('reward', '값없음'), user = User.objects.get(user_id = 'leehyojoon'))
     
     return HttpResponse()
 

@@ -57,7 +57,7 @@ class User(models.Model):
     user_id = models.CharField(db_column='user_ID', primary_key=True, max_length=45)  # Field name made lowercase.
     user_password = models.CharField(max_length=45)
     user_email = models.CharField(max_length=45, blank=True, null=True)
-    user_impormation = models.CharField(max_length=45, blank=True, null=True)
+    user_information = models.CharField(max_length=45, blank=True, null=True)
 
     class Meta:
         managed = False
