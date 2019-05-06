@@ -47,6 +47,6 @@ def insert_event(request):
 def insert_place(request):
 
     lastId = Place.objects.all().last().place_id
-    event = Place.objects.create(place_id = lastId + 1, place_name = 'place name')
+    place = Place.objects.create(place_id = lastId + 1, place_name = request.POST['place_name'], address = request.POST['address'], explanation = request.POST['explanation'])
 
     return HttpResponse()
