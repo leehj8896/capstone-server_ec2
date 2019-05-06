@@ -40,7 +40,7 @@ def print_dicts(query):
 def insert_event(request):
     
     lastId = Event.objects.all().last().event_id
-    event = Event.objects.create(event_id = lastId + 1, event_name = request.POST.get('event_name', '값없음'), reward = request.POST.get('reward', '값없음'), user = User.objects.get(user_id = 'leehyojoon'))
+    event = Event.objects.create(event_id = lastId + 1, event_name = request.POST['event_name'], reward = request.POST['reward'], user = User.objects.get(user_id = request.POST['user_id']))
     
     return HttpResponse()
 
