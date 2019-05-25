@@ -8,6 +8,16 @@
 from django.db import models
 
 
+class Auth(models.Model):
+    user = models.ForeignKey('User', models.DO_NOTHING)
+    event = models.ForeignKey('Event', models.DO_NOTHING)
+    auth_place_id = models.IntegerField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'auth'
+
+
 class AuthGroup(models.Model):
     name = models.CharField(unique=True, max_length=80)
 
@@ -156,9 +166,13 @@ class Place(models.Model):
     address = models.CharField(max_length=45, blank=True, null=True)
     explanation = models.CharField(max_length=45, blank=True, null=True)
     qr_message = models.CharField(max_length=45, blank=True, null=True)
-    coordinate = models.CharField(max_length=45, blank=True, null=True)
     latitude = models.FloatField(blank=True, null=True)
-    longtitude = models.FloatField(blank=True, null=True)
+    longitude = models.FloatField(blank=True, null=True)
+    auth_qr = models.IntegerField(blank=True, null=True)
+    becoan_distance = models.FloatField(blank=True, null=True)
+    auth_gps = models.IntegerField(blank=True, null=True)
+    auth_exif = models.IntegerField(blank=True, null=True)
+    picture = models.BinaryField(null=True)
 
     class Meta:
         managed = False
