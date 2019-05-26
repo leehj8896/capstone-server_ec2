@@ -173,6 +173,7 @@ class Place(models.Model):
     auth_gps = models.IntegerField(blank=True, null=True)
     auth_exif = models.IntegerField(blank=True, null=True)
     picture = models.BinaryField(null=True)
+    event = models.ForeignKey(Event, models.DO_NOTHING, blank=True, null=True)
 
     class Meta:
         managed = False

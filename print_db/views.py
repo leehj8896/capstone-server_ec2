@@ -26,6 +26,19 @@ def place(request):
 
     query = "select * from place"
 
+    event_id = request.POST.get('event_id', None)
+    temp_places_size = request.POST.get('temp_places_size', None)
+    
+    if event_id != None:
+        query += " where event_id = " + event_id
+    elif temp_places_size != None:
+        query += " where "
+        for i in range(int(temp_places_size)):
+            temp_place_id = request.POST['temp_places_id' + str(i)]
+            query += "place_id = " + temp_place_id
+            if i != int(temp_places_size) - 1:
+                query += " or "
+
     conn = MySQLdb.connect('127.0.0.1', 'root', '', 'capstone', charset='utf8')
     curs = conn.cursor(MySQLdb.cursors.DictCursor)
     curs.execute(query)
@@ -36,30 +49,33 @@ def place(request):
     for row in rows:
         result += str(row) + "\n"
     """
-    for row in rows:
+    for i in range(len(rows)):
         
-        one = "{'place_id': " + str(row['place_id'])
-        one += ", 'place_name': '" + str(row['place_name'])
-        one += "', 'address': '" + str(row['address'])
-        one += "', 'explanation': '" + str(row['explanation'])
-        one += "', 'qr_message': '" + str(row['qr_message'])
-        one += "', 'latitude': " + str(row['latitude'])
-        one += ", 'longitude': " + str(row['longitude'])
-        one += ", 'auth_qr': " + str(row['auth_qr'])
-        one += ", 'becoan_distance': " + str(row['becoan_distance'])
-        one += ", 'auth_gps': " + str(row['auth_gps'])
-        one += ", 'auth_exif': " + str(row['auth_exif'])
-        if row['picture'] == None:
-            one += ", 'picture': 'None'}\n"
+        one = "{'place_id': " + str(rows[i]['place_id'])
+        one += ", 'place_name': '" + str(rows[i]['place_name'])
+        one += "', 'address': '" + str(rows[i]['address'])
+        one += "', 'explanation': '" + str(rows[i]['explanation'])
+        one += "', 'qr_message': '" + str(rows[i]['qr_message'])
+        one += "', 'latitude': " + str(rows[i]['latitude'])
+        one += ", 'longitude': " + str(rows[i]['longitude'])
+        one += ", 'auth_qr': " + str(rows[i]['auth_qr'])
+        one += ", 'becoan_distance': " + str(rows[i]['becoan_distance'])
+        one += ", 'auth_gps': " + str(rows[i]['auth_gps'])
+        one += ", 'auth_exif': " + str(rows[i]['auth_exif'])
+        if rows[i]['picture'] == None:
+            one += ", 'picture': 'None'}"
         else:
-            basedImage = row['picture']
+            basedImage = rows[i]['picture']
             decodedImage = basedImage.decode("UTF-8")
             encodedImage = decodedImage.encode("UTF-8")
             reBasedImage = base64.b64decode(encodedImage)
             reDecodedImage = reBasedImage.decode("UTF-8")
-            one += ", 'picture': '" + reDecodedImage + "'}\n"
-
+            one += ", 'picture': '" + reDecodedImage + "'}"
+        
         result += one
+        if i != len(rows) - 1:
+            result += "%%%"
+
     conn.close()
     return HttpResponse(result)
 
