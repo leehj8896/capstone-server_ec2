@@ -4,6 +4,7 @@ from django.shortcuts import render
 import MySQLdb
 from django.db import IntegrityError
 import base64
+import json
 
 def index(request):
     return render(request, 'myserver/index.html')
@@ -25,7 +26,42 @@ def place(request):
 
     query = "select * from place"
 
-    return HttpResponse(print_dicts(query))
+    conn = MySQLdb.connect('127.0.0.1', 'root', '', 'capstone', charset='utf8')
+    curs = conn.cursor(MySQLdb.cursors.DictCursor)
+    curs.execute(query)
+    rows = curs.fetchall()
+
+    result = ""
+    """
+    for row in rows:
+        result += str(row) + "\n"
+    """
+    for row in rows:
+        
+        one = "{'place_id': " + str(row['place_id'])
+        one += ", 'place_name': '" + str(row['place_name'])
+        one += "', 'address': '" + str(row['address'])
+        one += "', 'explanation': '" + str(row['explanation'])
+        one += "', 'qr_message': '" + str(row['qr_message'])
+        one += "', 'latitude': " + str(row['latitude'])
+        one += ", 'longitude': " + str(row['longitude'])
+        one += ", 'auth_qr': " + str(row['auth_qr'])
+        one += ", 'becoan_distance': " + str(row['becoan_distance'])
+        one += ", 'auth_gps': " + str(row['auth_gps'])
+        one += ", 'auth_exif': " + str(row['auth_exif'])
+        if row['picture'] == None:
+            one += ", 'picture': 'None'}\n"
+        else:
+            basedImage = row['picture']
+            decodedImage = basedImage.decode("UTF-8")
+            encodedImage = decodedImage.encode("UTF-8")
+            reBasedImage = base64.b64decode(encodedImage)
+            reDecodedImage = reBasedImage.decode("UTF-8")
+            one += ", 'picture': '" + reDecodedImage + "'}\n"
+
+        result += one
+    conn.close()
+    return HttpResponse(result)
 
 def print_dicts(query):
 
@@ -83,13 +119,16 @@ def insert_imply(request):
 def insert_picture(request):
 
     image_string = request.POST['picture']
-    image_bytes = image_string.encode('utf-8')
+    image_bytes = image_string.encode('utf-8')        # 유니코드 >> 바이트
+    image_based = base64.b64encode(image_bytes)       # 바이트 >> base64
+#image_decoded = image_based.decode("UTF-8")       # base64 >> 유니코드
+
     lastID = Place.objects.all().last().place_id
     place = Place.objects.get(place_id=lastID)
-    place.picture = base64.b64encode(image_bytes)
+    place.picture = image_based
     place.save()
 
-    return HttpResponse()
+    return HttpResponse(image_based)
 
 def insert_user(request):
     try:
