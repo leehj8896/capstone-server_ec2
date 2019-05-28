@@ -25,7 +25,8 @@ def imply(request):
 def place(request):
 
     query = "select * from place"
-
+    return HttpResponse(print_dicts(query))
+    """
     event_id = request.POST.get('event_id', None)
     temp_places_size = request.POST.get('temp_places_size', None)
     
@@ -45,10 +46,6 @@ def place(request):
     rows = curs.fetchall()
 
     result = ""
-    """
-    for row in rows:
-        result += str(row) + "\n"
-    """
     for i in range(len(rows)):
         
         one = "{'place_id': " + str(rows[i]['place_id'])
@@ -69,15 +66,15 @@ def place(request):
             decodedImage = basedImage.decode("UTF-8")
             encodedImage = decodedImage.encode("UTF-8")
             reBasedImage = base64.b64decode(encodedImage)
-            reDecodedImage = reBasedImage.decode("UTF-8")
+            reDecodedImage = reBasedImage.decode("UTF-8").replace('\n', '')
             one += ", 'picture': '" + reDecodedImage + "'}"
         
         result += one
         if i != len(rows) - 1:
             result += "%%%"
-
     conn.close()
     return HttpResponse(result)
+    """
 
 def print_dicts(query):
 
@@ -245,12 +242,13 @@ def auth(request):
         query2 = 'select * from participation where user_id = "%s" and event_id = %d' %(user_id, event_id)
         query3 = 'select number_of_visits from participation where user_id="%s" and event_id=%d' %(user_id, event_id)
         number_of_visits = get_query(query3,'number_of_visits')+1
-        query4 = 'update participation set number_of_visits =%d where user_id = "%s" and event_id=%d' %(number_of_visits,user_id,event_id)
+# query4  'update participation set number_of_visits =%d where user_id = "%s" and event_id=%d' %(number_of_visits,user_id,event_id)
         if count_query(query) < 1:
             return HttpResponse('error')
-        else:
+        else: 
             auth = Auth.objects.create(user = User.objects.get(user_id=request.POST['user_id']), event = Event.objects.get(event_id=request.POST['event_id']), auth_place_id = place_id)
-            count_query(query4)
+            Participation.objects.filter(user = user_id, event = event_id).update(number_of_visits = number_of_visits)
+# count_query(query4) 
             return HttpResponse('ok')
     else:
         return HttpResponse('error')
@@ -261,3 +259,21 @@ def participate_event(request):
         return HttpResponse('ok')    
     except IntegrityError:
         return HttpResponse("duplicated")
+
+def participating(request):
+    user_id = request.POST['user_id']
+    query = "select event.event_name,event.event_id  from event, (select participation.event_id from participation where user_id='%s') as temp where event.event_id = temp.event_id" %(user_id)
+    conn = MySQLdb.connect('127.0.0.1', 'root', '', 'capstone', charset='utf8')
+    curs = conn.cursor(MySQLdb.cursors.DictCursor)
+    curs.execute(query)
+    rows = curs.fetchall()
+    result = ""
+    for row in rows:
+        result += str(row)+"\n"
+    conn.close()
+    return HttpResponse(result)
+'''
+def select_auth_method(request):
+    return HttpResponse()
+'''
+    

@@ -17,4 +17,5 @@ urlpatterns = [
         path("login/", views.login, name="login"),
         path("auth/", views.auth, name="auth"),
         path("ranking/", views.ranking, name="ranking"),
+        path("participating/", views.participating, name="participating"),
 ]
