@@ -123,8 +123,23 @@ def insert_place(request):
     e=request.POST['explanation']
     lat=request.POST['latitude']
     lon=request.POST['longitude']
+    qr=request.POST['check_qr']
+    be=request.POST['beacon_distance']
+    gps=request.POST['check_gps']
+    exif=request.POST['check_exif']
     place = Place.objects.create(place_id=lastId+1, place_name=n, address=a, explanation=e, latitude=lat, longitude=lon)
     imply = Imply.objects.create(event_id=Event.objects.all().last().event_id, place_id=Place.objects.all().last().place_id)
+
+    instance = Place.objects.get(place_id=lastId+1)
+    if qr == '1':
+        instance.auth_qr = 1
+    if be == '1':
+        instance.becoan_distance = 1
+    if gps == '1':
+        instance.auth_gps = 1
+    if exif == '1':
+        instance.auth_exif = 1
+    instance.save()
 
     return HttpResponse(lastId + 1)
 
