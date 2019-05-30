@@ -18,4 +18,5 @@ urlpatterns = [
         path("auth/", views.auth, name="auth"),
         path("ranking/", views.ranking, name="ranking"),
         path("participating/", views.participating, name="participating"),
+        path('select_auth_method/', views.select_auth_method, name='select_auth_method'),
 ]

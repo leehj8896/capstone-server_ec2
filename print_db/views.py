@@ -272,8 +272,20 @@ def participating(request):
         result += str(row)+"\n"
     conn.close()
     return HttpResponse(result)
-'''
+
 def select_auth_method(request):
-    return HttpResponse()
-'''
+    place_id = int(request.POST['place_id'])
+    qr_query = 'select * from (select auth_qr from place where place_id = %d) as t where t.auth_qr is not null' %(place_id)
+    becoan_query = 'select * from (select becoan_distance from place where place_id = %d) as t where t.becoan_distance is not null' %(place_id)
+    exif_query = 'select * from (select auth_exif from place where place_id = %d) as t where t.auth_exif is not null' %(place_id)
+    gps_query = 'select * from (select auth_gps from place where place_id = %d) as t where t.auth_gps is not null' %(place_id)
+    qr = count_query(qr_query)
+    becoan = count_query(becoan_query)
+    exif = count_query(exif_query)
+    gps = count_query(gps_query)
+    return HttpResponse('qr: %d,becoan: %d,exif:%d,gps: %d' %(qr,becoan,exif,gps)) 
+          
+
+
+
     
