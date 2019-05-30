@@ -212,12 +212,10 @@ def auth(request):
         result = count_query(query)
    
     elif auth_num == '2':
-        distance = float(request.POST['becoan_distance'])
-        query = 'select becoan_distance from place where place_id = %d' % place_id
-        becoan_distance = float(get_query(query,'becoan_distance'))
-        if abs(distance-becoan_distance) < 20:
+         beacoan = int(request.POST['beacon_distance'])
+         if beacoan == 1:
             result = 1
-        else:
+         else:
             result = -1
     elif auth_num == '3':
         latitude = float(request.POST['latitude'])
