@@ -112,13 +112,19 @@ def insert_event(request):
     lastId = Event.objects.all().last().event_id
     event = Event.objects.create(event_id=lastId+1, event_name=request.POST['event_name'], reward=request.POST['reward'], user=User.objects.get(user_id=request.POST['user_id']))
     
+
     return HttpResponse(lastId + 1)
 
 def insert_place(request):
 
     lastId = Place.objects.all().last().place_id
-    place = Place.objects.create(place_id=lastId+1, place_name=request.POST['place_name'], address=request.POST['address'], explanation=request.POST['explanation'])
-    #imply = Imply.objects.create(event_id=Event.objects.all().last().event_id, place_id=Place.objects.all().last().place_id)
+    n=request.POST['place_name']
+    a=request.POST['address']
+    e=request.POST['explanation']
+    lat=request.POST['latitude']
+    lon=request.POST['longitude']
+    place = Place.objects.create(place_id=lastId+1, place_name=n, address=a, explanation=e, latitude=lat, longitude=lon)
+    imply = Imply.objects.create(event_id=Event.objects.all().last().event_id, place_id=Place.objects.all().last().place_id)
 
     return HttpResponse(lastId + 1)
 
@@ -283,7 +289,30 @@ def select_auth_method(request):
     gps = count_query(gps_query)
     return HttpResponse('qr: %d,becoan: %d,exif:%d,gps: %d' %(qr,becoan,exif,gps)) 
           
-
-
+def finish_auth_check(request):
+    user_id = request.POST['user_id']
+    event_id = int(request.POST['event_id'])
+    query1 = 'select count(place_id) place_id  from place where event_id = %d' %(event_id)
+    query2 = 'select number_of_visits from participation where event_id = %d and user_id = "%s"' %(event_id, user_id)
+    place_num = get_query(query1, 'place_id')
+    user_place_num = get_query(query2, 'number_of_visits')
+    if place_num == user_place_num:
+        return HttpResponse('ok')
+    else:
+        return HttpResponse('error')
+def place_auth_info(request):
+    user_id = request.POST['user_id']
+    event_id = int(request.POST['event_id'])
+    query = 'select auth_place_id from auth where user_id = "%s" and event_id = %d' %(user_id, event_id)
+    
+    conn = MySQLdb.connect('127.0.0.1', 'root', '', 'capstone', charset='utf8')
+    curs = conn.cursor(MySQLdb.cursors.DictCursor)
+    curs.execute(query)
+    rows = curs.fetchall()
+    result = ""
+    for row in rows:
+        result += str(row) + "\n"
+    conn.close()
+    return HttpResponse(result)
 
     

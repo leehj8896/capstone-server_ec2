@@ -19,4 +19,6 @@ urlpatterns = [
         path("ranking/", views.ranking, name="ranking"),
         path("participating/", views.participating, name="participating"),
         path('select_auth_method/', views.select_auth_method, name='select_auth_method'),
+        path('finish_auth_check/', views.finish_auth_check, name='finish_auth_check'),
+        path('place_auth_info/', views.place_auth_info, name='place_auth_info'),
 ]
